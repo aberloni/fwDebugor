@@ -1,0 +1,20 @@
+{
+  "name": "com.ab.fwp.debugor",
+  "version": "0.0.2",
+  "displayName": "ab:debugor",
+  "description": "framework debug tools",
+  "keywords": [
+    "tools"
+  ],
+  "category": "tools",
+  "repository": {
+    "url": "https://github.com/aberloni/fwDebugor",
+    "type": "git"
+  },
+  "author": {
+    "name": "Andrei Berloni",
+    "email": "dev@andreberlemont.com",
+    "url": "http://www.andreberlemont.com"
+  },
+  "type": "library"
+}
