@@ -64,6 +64,9 @@ namespace fwp.debug
 			return path;
 		}
 
+		/// <summary>
+		/// won't dump if file exists
+		/// </summary>
 		static public void dumpSingle(iDump candidate)
 		{
 			string path = solvePath(candidate);
