@@ -8,8 +8,9 @@ namespace fwp.hardware
 		/// <summary>
 		/// must be called by context at appropriate time
 		/// </summary>
-		static public void dump()
+		static public void dump(bool alsoLog = false)
 		{
+			if (alsoLog) Instance.log();
 			fwp.debug.Dumper.dumpSingle(Instance);
 		}
 
