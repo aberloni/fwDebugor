@@ -151,8 +151,6 @@ namespace fwp.debug
 
 		void HandleLog(string logString, string stackTrace, LogType type)
 		{
-			Debug.Log(" >>> (" + type + ") " + logString);
-
 			switch (type)
 			{
 				case LogType.Error:
@@ -173,6 +171,8 @@ namespace fwp.debug
 			_log.log = $"[{type}]	" + log;
 			_log.stack = stack;
 			logs.Add(_log);
+			
+			//Debug.Log(" >>> (" + type + ") " + log);
 
 			if (logs.Count > 10)
 			{
