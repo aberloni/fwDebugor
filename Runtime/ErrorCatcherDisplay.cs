@@ -31,7 +31,7 @@ namespace fwp.debug
 		public string GetFilename() => "error-catcher";
 		public bool IsTimestamped() => true;
 
-		virtual protected string dumpSubFolder() => null;
+		virtual protected string dumpSubFolder() => "Dump";
 
 		void Start()
 		{
@@ -42,13 +42,30 @@ namespace fwp.debug
 			Debug.Log("<color=red>ERROR CATCHER EXISTS</color>");
 		}
 
+		/// <summary>
+		/// a key to simulate an error
+		/// </summary>
 		virtual protected bool keySimuReleased()
 		{
 			return Keyboard.current.homeKey.wasReleasedThisFrame;
 		}
 
+		/// <summary>
+		/// a key to force a dump
+		/// </summary>
+		virtual protected bool keyDumpReleased()
+		{
+			return false;
+		}
+
 		private void Update()
 		{
+			if(keyDumpReleased()) // force dump
+			{
+				Debug.LogWarning("dump!");
+				dump();
+			}
+
 			if (keySimuReleased()) // simulate error
 			{
 				simulateLogError();
@@ -73,6 +90,11 @@ namespace fwp.debug
 		{
 			unsub();
 
+			dump();
+		}
+
+		void dump()
+		{
 			if (logs.Count > 0)
 			{
 				Dumper.dumpRoot(this, dumpSubFolder());

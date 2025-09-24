@@ -64,11 +64,11 @@ namespace fwp.debug
 			if (!string.IsNullOrEmpty(subFolder))
 			{
 				path = Path.Combine(PathData, subFolder);
+
+				if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 			}
-			else
-			{
-				path = Path.Combine(path, _file + ext);
-			}
+
+			path = Path.Combine(path, _file + ext);
 
 			return path;
 		}
@@ -78,7 +78,7 @@ namespace fwp.debug
 		/// </summary>
 		static public void dumpSingle(iDump candidate, string subFolder = null)
 		{
-			string path = solvePath(candidate);
+			string path = solvePath(candidate, subFolder);
 
 			if (File.Exists(path))
 				return;
@@ -91,8 +91,7 @@ namespace fwp.debug
 		/// </summary>
 		static public void dumpRoot(iDump candidate, string subFolder = null)
 		{
-			string path = solvePath(candidate);
-			dump(candidate, path);
+			dump(candidate, solvePath(candidate, subFolder));
 		}
 
 		static void dump(iDump candidate, string path)
