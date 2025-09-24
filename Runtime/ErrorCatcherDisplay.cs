@@ -31,9 +31,10 @@ namespace fwp.debug
 		public string GetFilename() => "error-catcher";
 		public bool IsTimestamped() => true;
 
+		virtual protected string dumpSubFolder() => null;
+
 		void Start()
 		{
-
 			sub();
 
 			show = false;
@@ -55,8 +56,6 @@ namespace fwp.debug
 			}
 		}
 
-		//private void OnDisable(){ }
-
 		public string Stringify()
 		{
 			string ret = _new_line + "x" + logs.Count + _new_line;
@@ -74,19 +73,15 @@ namespace fwp.debug
 		{
 			unsub();
 
-			hardware.Hardware.dump();
-
 			if (logs.Count > 0)
 			{
-				Dumper.dumpRoot(this);
+				Dumper.dumpRoot(this, dumpSubFolder());
 			}
-
 		}
 
 		static public void simulateLogError()
 		{
 			Debug.LogError("simulated log.error");
-
 		}
 
 		static public void simulateNullRef()

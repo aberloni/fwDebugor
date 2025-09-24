@@ -46,7 +46,7 @@ namespace fwp.debug
 			_dt_init = DateTime.Now;
 		}
 
-		static string solvePath(iDump candidate)
+		static string solvePath(iDump candidate, string subFolder = null)
 		{
 			var dt = System.DateTime.Now;
 
@@ -59,7 +59,16 @@ namespace fwp.debug
 				_file += "_" + dt.ToString("yyyy-MM-dd_HH-mm");
 			}
 
-			string path = Path.Combine(PathData, _file + ext);
+			string path = PathData;
+
+			if (!string.IsNullOrEmpty(subFolder))
+			{
+				path = Path.Combine(PathData, subFolder);
+			}
+			else
+			{
+				path = Path.Combine(path, _file + ext);
+			}
 
 			return path;
 		}
@@ -67,10 +76,10 @@ namespace fwp.debug
 		/// <summary>
 		/// won't dump if file exists
 		/// </summary>
-		static public void dumpSingle(iDump candidate)
+		static public void dumpSingle(iDump candidate, string subFolder = null)
 		{
 			string path = solvePath(candidate);
-			
+
 			if (File.Exists(path))
 				return;
 
@@ -80,7 +89,7 @@ namespace fwp.debug
 		/// <summary>
 		/// dump content in a file at root level of build/editor
 		/// </summary>
-		static public void dumpRoot(iDump candidate)
+		static public void dumpRoot(iDump candidate, string subFolder = null)
 		{
 			string path = solvePath(candidate);
 			dump(candidate, path);
@@ -92,11 +101,11 @@ namespace fwp.debug
 
 			// header
 			string dump = "[" + fwp.hardware.Hardware.DeviceUid + "]	" + dt.ToString("yyyy-MM-dd HH:mm:ss");
-			if(candidate.IsTimestamped())
+			if (candidate.IsTimestamped())
 			{
 				dump += Environment.NewLine + "> played time :	" + DeltaSinceStartup; // HH:MM:SS
 			}
-			
+
 			// content
 			dump += System.Environment.NewLine + candidate.Stringify();
 
