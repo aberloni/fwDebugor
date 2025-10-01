@@ -64,9 +64,14 @@ namespace fwp.hardware
 			systemMemorySize = SystemInfo.systemMemorySize;
 		}
 
-		public string Stringify()
+		public string StringifyHeader()
 		{
-			string ret = "<b>[HARDWARE]</b>";
+			return "<b>[HARDWARE]</b>";
+		}
+
+		public string StringifyContent()
+		{
+			string ret = string.Empty;
 			ret += "\nDevice model: " + deviceModel;
 			ret += "\nDevice name: " + deviceName;
 			ret += "\nDevice type: " + deviceType;
@@ -82,7 +87,8 @@ namespace fwp.hardware
 
 		public void log()
 		{
-			Debug.Log(Stringify());
+			Debug.Log(StringifyHeader());
+			Debug.Log(StringifyContent());
 		}
 
 #if UNITY_EDITOR

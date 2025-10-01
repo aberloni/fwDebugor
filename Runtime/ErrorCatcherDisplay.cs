@@ -13,7 +13,7 @@ namespace fwp.debug
 	/// </summary>
 	public class ErrorCatcherDisplay : MonoBehaviour, iDump
 	{
-		const string _new_line = "\n";
+		protected const string _new_line = "\n";
 
 		GUIStyle generic_style;
 		Texture2D rgb_texture;
@@ -35,12 +35,17 @@ namespace fwp.debug
 
 		void Start()
 		{
-			sub();
+			subApplication();
 
 			show = false;
 
 			Debug.Log("<color=red>ERROR CATCHER EXISTS</color>");
+
+			setup();
 		}
+
+		virtual protected void setup()
+		{ }
 
 		/// <summary>
 		/// a key to simulate an error
@@ -60,7 +65,12 @@ namespace fwp.debug
 
 		private void Update()
 		{
-			if(keyDumpReleased()) // force dump
+			update();
+		}
+
+		virtual protected void update()
+		{
+			if (keyDumpReleased()) // force dump
 			{
 				Debug.LogWarning("dump!");
 				dump();
@@ -73,9 +83,17 @@ namespace fwp.debug
 			}
 		}
 
-		public string Stringify()
+		virtual public string StringifyHeader()
 		{
-			string ret = _new_line + "x" + logs.Count + _new_line;
+			return GetType().ToString() + "x" + logs.Count;
+		}
+
+		/// <summary>
+		/// dump interface
+		/// </summary>
+		virtual public string StringifyContent()
+		{
+			string ret = string.Empty;
 
 			foreach (var l in logs)
 			{
@@ -88,11 +106,13 @@ namespace fwp.debug
 
 		private void OnDestroy()
 		{
-			unsub();
-
+			unsubApplication();
 			dump();
 		}
 
+		/// <summary>
+		/// called on destroy
+		/// </summary>
 		void dump()
 		{
 			if (logs.Count > 0)
@@ -101,18 +121,7 @@ namespace fwp.debug
 			}
 		}
 
-		static public void simulateLogError()
-		{
-			Debug.LogError("simulated log.error");
-		}
-
-		static public void simulateNullRef()
-		{
-			GameObject obj = null;
-			obj.name += "foo";
-		}
-
-		void sub()
+		void subApplication()
 		{
 			// main thread only
 			// https://docs.unity3d.com/6000.2/Documentation/ScriptReference/Application-logMessageReceived.html
@@ -124,7 +133,7 @@ namespace fwp.debug
 			Application.logMessageReceivedThreaded += HandleLogThreaded;
 		}
 
-		void unsub()
+		void unsubApplication()
 		{
 			//Application.logMessageReceived -= HandleLog;
 			Application.logMessageReceivedThreaded -= HandleLogThreaded;
@@ -171,7 +180,7 @@ namespace fwp.debug
 			_log.log = $"[{type}]	" + log;
 			_log.stack = stack;
 			logs.Add(_log);
-			
+
 			//Debug.Log(" >>> (" + type + ") " + log);
 
 			if (logs.Count > 10)
@@ -264,6 +273,17 @@ namespace fwp.debug
 			}
 			rgb_texture.Apply();
 			if (generic_style == null) generic_style = new GUIStyle();
+		}
+
+		static public void simulateLogError()
+		{
+			Debug.LogError("simulated log.error");
+		}
+
+		static public void simulateNullRef()
+		{
+			GameObject obj = null;
+			obj.name += "foo";
 		}
 
 #if UNITY_EDITOR

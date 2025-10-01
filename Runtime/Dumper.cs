@@ -8,7 +8,8 @@ namespace fwp.debug
 	public interface iDump
 	{
 		public string GetFilename();
-		public string Stringify();
+		public string StringifyHeader();
+		public string StringifyContent();
 		public bool IsTimestamped();
 	}
 
@@ -98,15 +99,18 @@ namespace fwp.debug
 		{
 			var dt = System.DateTime.Now;
 
-			// header
+			// universal header
 			string dump = "[" + fwp.hardware.Hardware.DeviceUid + "]	" + dt.ToString("yyyy-MM-dd HH:mm:ss");
 			if (candidate.IsTimestamped())
 			{
 				dump += Environment.NewLine + "> played time :	" + DeltaSinceStartup; // HH:MM:SS
 			}
 
+			// header
+			dump += System.Environment.NewLine + candidate.StringifyHeader();
+
 			// content
-			dump += System.Environment.NewLine + candidate.Stringify();
+			dump += System.Environment.NewLine + candidate.StringifyContent();
 
 			// dump
 			File.WriteAllText(path, dump);
