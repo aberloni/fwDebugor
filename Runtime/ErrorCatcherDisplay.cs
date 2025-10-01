@@ -18,7 +18,7 @@ namespace fwp.debug
 		GUIStyle generic_style;
 		Texture2D rgb_texture;
 
-		struct LogEvent
+		public struct LogEvent
 		{
 			public string log;
 			public string stack;
