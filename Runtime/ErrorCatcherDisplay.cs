@@ -33,14 +33,18 @@ namespace fwp.debug
 
 		virtual protected string dumpSubFolder() => "Dump";
 
-		virtual protected bool isFeatureActive() => Debug.isDebugBuild;
+		/// <summary>
+		/// default is removal in release builds
+		/// </summary>
+		virtual protected bool isPresent() => Debug.isDebugBuild;
+
+		virtual protected bool isReactToLogs() => Debug.isDebugBuild;
+		virtual protected bool isDumpOnDestroy() => Debug.isDebugBuild;
 
 		void Start()
 		{
-			if (!isFeatureActive())
+			if (!isPresent())
 			{
-				enabled = false;
-
 				Destroy(this);
 				return;
 			}
@@ -52,7 +56,10 @@ namespace fwp.debug
 		{
 			Debug.Log("<color=red>ERROR CATCHER EXISTS</color>");
 
-			subToApplicationErrors();
+			if (isReactToLogs())
+			{
+				subToApplicationErrors();
+			}
 		}
 
 		/// <summary>
@@ -78,8 +85,14 @@ namespace fwp.debug
 
 		private void OnDestroy()
 		{
-			unsubApplication();
-			dump();
+			if (isReactToLogs())
+			{
+				unsubApplication();
+			}
+			if (isDumpOnDestroy())
+			{
+				dump();
+			}
 		}
 
 		virtual protected void update()
