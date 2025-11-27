@@ -33,19 +33,27 @@ namespace fwp.debug
 
 		virtual protected string dumpSubFolder() => "Dump";
 
+		virtual protected bool isFeatureActive() => Debug.isDebugBuild;
+
 		void Start()
 		{
-			subApplication();
+			if (!isFeatureActive())
+			{
+				enabled = false;
 
-			show = false;
-
-			Debug.Log("<color=red>ERROR CATCHER EXISTS</color>");
+				Destroy(this);
+				return;
+			}
 
 			setup();
 		}
 
 		virtual protected void setup()
-		{ }
+		{
+			Debug.Log("<color=red>ERROR CATCHER EXISTS</color>");
+
+			subToApplicationErrors();
+		}
 
 		/// <summary>
 		/// a key to simulate an error
@@ -60,12 +68,18 @@ namespace fwp.debug
 		/// </summary>
 		virtual protected bool keyDumpReleased()
 		{
-			return false;
+			return Keyboard.current.insertKey.wasReleasedThisFrame;
 		}
 
 		private void Update()
 		{
 			update();
+		}
+
+		private void OnDestroy()
+		{
+			unsubApplication();
+			dump();
 		}
 
 		virtual protected void update()
@@ -104,12 +118,6 @@ namespace fwp.debug
 			return ret;
 		}
 
-		private void OnDestroy()
-		{
-			unsubApplication();
-			dump();
-		}
-
 		/// <summary>
 		/// called on destroy
 		/// </summary>
@@ -121,7 +129,7 @@ namespace fwp.debug
 			}
 		}
 
-		void subApplication()
+		void subToApplicationErrors()
 		{
 			// main thread only
 			// https://docs.unity3d.com/6000.2/Documentation/ScriptReference/Application-logMessageReceived.html
@@ -287,7 +295,9 @@ namespace fwp.debug
 		}
 
 #if UNITY_EDITOR
-		[UnityEditor.MenuItem("Tools/Debugor/trigger error")]
+		const string base_path = "Toosl/Debugor/";
+
+		[UnityEditor.MenuItem(base_path + "trigger error")]
 		static public void cmMenuTrigger()
 		{
 			if (!Application.isPlaying) return;
@@ -296,10 +306,10 @@ namespace fwp.debug
 			ecd.cmTriggerNull();
 		}
 
-		[ContextMenu("Tools/Debugor/sim:log error")]
+		[ContextMenu(base_path + "sim:log error")]
 		public void cmTriggerError() => simulateLogError();
 
-		[ContextMenu("Tools/Debugor/sim:null ref")]
+		[ContextMenu(base_path + "sim:null ref")]
 		public void cmTriggerNull() => simulateNullRef();
 
 #endif
