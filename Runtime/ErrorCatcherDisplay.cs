@@ -36,7 +36,7 @@ namespace fwp.debug
 		/// <summary>
 		/// default is removal in release builds
 		/// </summary>
-		virtual protected bool isPresent() => Debug.isDebugBuild;
+		virtual protected bool isPresent() => Application.isEditor || Debug.isDebugBuild;
 
 		virtual protected bool isReactToLogs() => Debug.isDebugBuild;
 		virtual protected bool isDumpOnDestroy() => Debug.isDebugBuild;
