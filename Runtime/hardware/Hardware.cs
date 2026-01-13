@@ -92,12 +92,12 @@ namespace fwp.hardware
 		}
 
 #if UNITY_EDITOR
-		[UnityEditor.MenuItem("Tools/Debugor/Hardware/log")]
+		[UnityEditor.MenuItem(DebugorStatics.base_path + "Hardware/log")]
 		static void miLogHardware()
 		{
 			new Hardware().log();
 		}
-		[UnityEditor.MenuItem("Tools/Debugor/Hardware/dump")]
+		[UnityEditor.MenuItem(DebugorStatics.base_path + "Hardware/dump")]
 		static void miDumpHardware() => dump();
 
 #endif

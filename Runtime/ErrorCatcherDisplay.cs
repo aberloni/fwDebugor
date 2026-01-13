@@ -308,9 +308,8 @@ namespace fwp.debug
 		}
 
 #if UNITY_EDITOR
-		const string base_path = "Toosl/Debugor/";
 
-		[UnityEditor.MenuItem(base_path + "trigger error")]
+		[UnityEditor.MenuItem(DebugorStatics.base_path + "trigger error")]
 		static public void cmMenuTrigger()
 		{
 			if (!Application.isPlaying) return;
@@ -319,10 +318,10 @@ namespace fwp.debug
 			ecd.cmTriggerNull();
 		}
 
-		[ContextMenu(base_path + "sim:log error")]
+		[ContextMenu(DebugorStatics.base_path + "sim:log error")]
 		public void cmTriggerError() => simulateLogError();
 
-		[ContextMenu(base_path + "sim:null ref")]
+		[ContextMenu(DebugorStatics.base_path + "sim:null ref")]
 		public void cmTriggerNull() => simulateNullRef();
 
 #endif
