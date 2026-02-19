@@ -1,19 +1,14 @@
+using System;
+using System.Text;
 using UnityEngine;
+
+using fwp.debug;
 
 namespace fwp.hardware
 {
 	[System.Serializable]
 	public class Hardware : fwp.debug.iDump
 	{
-		/// <summary>
-		/// must be called by context at appropriate time
-		/// </summary>
-		static public void dump(bool alsoLog = false)
-		{
-			if (alsoLog) Instance.log();
-			fwp.debug.Dumper.dumpSingle(Instance);
-		}
-
 		static Hardware instance;
 		static public Hardware Instance
 		{
@@ -64,25 +59,30 @@ namespace fwp.hardware
 			systemMemorySize = SystemInfo.systemMemorySize;
 		}
 
-		public string StringifyHeader()
+		virtual public string StringifyHeader()
 		{
-			return "<b>[HARDWARE]</b>";
+			return "[HARDWARE]";
 		}
 
-		public string StringifyContent()
+		virtual public string StringifyContent()
 		{
-			string ret = string.Empty;
-			ret += "\nDevice model: " + deviceModel;
-			ret += "\nDevice name: " + deviceName;
-			ret += "\nDevice type: " + deviceType;
-			ret += "\nGraphics device name: " + graphicsDeviceName;
-			ret += "\nGraphics device vendor: " + graphicsDeviceVendor;
-			ret += "\nGraphics device version: " + graphicsDeviceVersion;
-			ret += "\nOS: " + operatingSystem;
-			ret += "\nProcessor count: " + processorCount;
-			ret += "\nProcessor type: " + processorType;
-			ret += "\nMemory size: " + systemMemorySize;
-			return ret;
+			StringBuilder str = new();
+
+			str.AppendLine("OS: " + operatingSystem);
+			str.AppendLine("Memory size: " + systemMemorySize);
+
+			str.AppendLine("Device model: " + deviceModel);
+			str.AppendLine("Device name: " + deviceName);
+			str.AppendLine("Device type: " + deviceType);
+
+			str.AppendLine("Graphics device name: " + graphicsDeviceName);
+			str.AppendLine("Graphics device vendor: " + graphicsDeviceVendor);
+			str.AppendLine("Graphics device version: " + graphicsDeviceVersion);
+
+			str.AppendLine("Processor count: " + processorCount);
+			str.AppendLine("Processor type: " + processorType);
+
+			return str.ToString();
 		}
 
 		public void log()
@@ -95,11 +95,13 @@ namespace fwp.hardware
 		[UnityEditor.MenuItem(DebugorStatics.base_path + "Hardware/log")]
 		static void miLogHardware()
 		{
-			new Hardware().log();
+			Instance.log();
 		}
 		[UnityEditor.MenuItem(DebugorStatics.base_path + "Hardware/dump")]
-		static void miDumpHardware() => dump();
-
+		static void miDumpHardware()
+		{
+			new Dumper(Instance);
+		}
 #endif
 
 	}

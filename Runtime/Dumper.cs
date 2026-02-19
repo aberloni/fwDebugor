@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.IO;
 using System;
+using System.Text;
 
 namespace fwp.debug
 {
@@ -13,9 +14,128 @@ namespace fwp.debug
 		public bool IsTimestamped();
 	}
 
-	static public class Dumper
+	public class Dumper
 	{
-		const string ext = ".dump";
+		// data/dump/file.dump
+		public const string __defaultFolder = "Dumps";
+
+		// file.dump
+		public const string __ext = ".dump";
+
+		static DateTime _dt_init;
+
+		/// <summary>
+		/// time elapsed since app launched
+		/// </summary>
+		static TimeSpan DeltaSinceStartup => DateTime.Now - _dt_init;
+
+		[RuntimeInitializeOnLoadMethod]
+		static void initialize()
+		{
+			_dt_init = DateTime.Now;
+		}
+
+		public string PathDump
+		{
+			get
+			{
+				return Path.Combine(GetLocalHDrivePath(), "dump");
+			}
+		}
+
+		/// <summary>
+		/// subfolder
+		/// data/subFolder/dump.dump
+		/// </summary>
+		/// <param name="candidate"></param>
+		/// <param name="subFolder"></param>
+		public Dumper(iDump candidate, string subFolder = __defaultFolder, bool noDuplicate = false)
+		{
+			string _path = solvePath(subFolder);
+			if (!Directory.Exists(_path)) Directory.CreateDirectory(_path);
+			_path = Path.Combine(_path, solveFileName(candidate));
+
+			if (noDuplicate && File.Exists(_path))
+			{
+				if (Application.isEditor)
+				{
+					Debug.Log("[dump] no duplicate @ " + _path);
+
+				}
+				return;
+			}
+
+			dump(candidate, _path);
+		}
+
+		/// <summary>
+		/// returns filename.ext
+		/// </summary>
+		string solveFileName(iDump candidate)
+		{
+			string _file = hardware.Hardware.DeviceUid + "_" + candidate.GetFilename();
+
+			var dt = System.DateTime.Now;
+
+			if (candidate.IsTimestamped())
+			{
+				// device_file_2025...
+				_file += "_" + dt.ToString("yyyy-MM-dd_HH-mm");
+			}
+
+			return _file + __ext;
+		}
+
+		/// <summary>
+		/// folder where file should be created/dumped
+		/// </summary>
+		string solvePath(string subFolder = null)
+		{
+			string _path = GetLocalHDrivePath();
+
+			if (!string.IsNullOrEmpty(subFolder))
+			{
+				_path = Path.Combine(_path, subFolder);
+			}
+
+			return _path;
+		}
+
+		/// <summary>
+		/// absPath is path/filename.ext
+		/// </summary>
+		void dump(iDump candidate, string absPath)
+		{
+			// SOLVE PATH
+
+			// SOLVE CONTENT
+
+			
+			StringBuilder dump = new();
+
+			dump.AppendLine("[" + fwp.hardware.Hardware.DeviceUid + "]");
+
+			var dt = DateTime.Now;
+			dump.AppendLine(dt.ToString("yyyy-MM-dd HH:mm:ss"));
+
+			if (candidate.IsTimestamped())
+			{
+				dump.AppendLine("time played: " + DeltaSinceStartup); // HH:MM:SS
+			}
+
+			dump.AppendLine(string.Empty);
+			dump.AppendLine(candidate.StringifyHeader());
+			dump.AppendLine(candidate.StringifyContent());
+
+			// DUMP
+
+			File.WriteAllText(absPath, dump.ToString());
+
+			if (Application.isEditor)
+			{
+				Debug.Log("/! dump (len:" + dump.Length + "): " + absPath);
+			}
+		}
 
 		/// <summary>
 		/// https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Application-dataPath.html
@@ -27,95 +147,10 @@ namespace fwp.debug
 		/// Unity Editor: <path to project folder>/Assets
 		/// Android: Normally it points directly to the APK.If you are running a split binary build, it points to the OBB instead.
 		/// </summary>
-		static public string PathData => Application.dataPath;
-
-		// app/_data/dump/
-		static public string Dump
+		virtual protected string GetLocalHDrivePath()
 		{
-			get
-			{
-				return Path.Combine(PathData, "dump");
-			}
-		}
-
-		static DateTime _dt_init;
-		static TimeSpan DeltaSinceStartup => DateTime.Now - _dt_init;
-
-		[RuntimeInitializeOnLoadMethod]
-		static void generate()
-		{
-			_dt_init = DateTime.Now;
-		}
-
-		static string solvePath(iDump candidate, string subFolder = null)
-		{
-			var dt = System.DateTime.Now;
-
-			// device_file
-			string _file = hardware.Hardware.DeviceUid + "_" + candidate.GetFilename();
-
-			if (candidate.IsTimestamped())
-			{
-				// device_file_2025...
-				_file += "_" + dt.ToString("yyyy-MM-dd_HH-mm");
-			}
-
-			string path = PathData;
-
-			if (!string.IsNullOrEmpty(subFolder))
-			{
-				path = Path.Combine(PathData, subFolder);
-
-				if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-			}
-
-			path = Path.Combine(path, _file + ext);
-
-			return path;
-		}
-
-		/// <summary>
-		/// won't dump if file exists
-		/// </summary>
-		static public void dumpSingle(iDump candidate, string subFolder = null)
-		{
-			string path = solvePath(candidate, subFolder);
-
-			if (File.Exists(path))
-				return;
-
-			dump(candidate, path);
-		}
-
-		/// <summary>
-		/// dump content in a file at root level of build/editor
-		/// </summary>
-		static public void dumpRoot(iDump candidate, string subFolder = null)
-		{
-			dump(candidate, solvePath(candidate, subFolder));
-		}
-
-		static void dump(iDump candidate, string path)
-		{
-			var dt = System.DateTime.Now;
-
-			// universal header
-			string dump = "[" + fwp.hardware.Hardware.DeviceUid + "]	" + dt.ToString("yyyy-MM-dd HH:mm:ss");
-			if (candidate.IsTimestamped())
-			{
-				dump += Environment.NewLine + "> played time :	" + DeltaSinceStartup; // HH:MM:SS
-			}
-
-			// header
-			dump += System.Environment.NewLine + candidate.StringifyHeader();
-
-			// content
-			dump += System.Environment.NewLine + candidate.StringifyContent();
-
-			// dump
-			File.WriteAllText(path, dump);
-
-			Debug.LogWarning("dump (" + dump.Length + ") @ " + path);
+			if (Application.isEditor) return Application.dataPath;
+			else return Application.persistentDataPath;
 		}
 	}
 

@@ -31,7 +31,7 @@ namespace fwp.debug
 		public string GetFilename() => "error-catcher";
 		public bool IsTimestamped() => true;
 
-		virtual protected string dumpSubFolder() => "Dump";
+		virtual protected string dumpSubFolder() => Dumper.__defaultFolder;
 
 		/// <summary>
 		/// default is removal in release builds
@@ -138,7 +138,7 @@ namespace fwp.debug
 		{
 			if (logs.Count > 0)
 			{
-				Dumper.dumpRoot(this, dumpSubFolder());
+				new Dumper(this, dumpSubFolder());
 			}
 		}
 
