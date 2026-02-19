@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace fwp.debug
 {
@@ -68,7 +67,11 @@ namespace fwp.debug
 		/// </summary>
 		virtual protected bool keySimuReleased()
 		{
-			return Keyboard.current.homeKey.wasReleasedThisFrame;
+#if ENABLE_INPUT_SYSTEM
+			return UnityEngine.InputSystem.Keyboard.current.homeKey.wasReleasedThisFrame;
+#else
+			return false;
+#endif
 		}
 
 		/// <summary>
@@ -76,7 +79,11 @@ namespace fwp.debug
 		/// </summary>
 		virtual protected bool keyDumpReleased()
 		{
-			return Keyboard.current.insertKey.wasReleasedThisFrame;
+#if ENABLE_INPUT_SYSTEM
+			return UnityEngine.InputSystem.Keyboard.current.insertKey.wasReleasedThisFrame;
+#else
+			return false;
+#endif
 		}
 
 		private void Update()
