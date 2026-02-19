@@ -36,16 +36,22 @@ namespace fwp.debug
 		/// <summary>
 		/// default is removal in release builds
 		/// </summary>
-		virtual protected bool isPresent() => Application.isEditor || Debug.isDebugBuild;
+		virtual protected bool IsPresent => Application.isEditor || Debug.isDebugBuild;
 
 		virtual protected bool isReactToLogs() => Debug.isDebugBuild;
 		virtual protected bool isDumpOnDestroy() => Debug.isDebugBuild;
 
 		void Start()
 		{
-			if (!isPresent())
+			if (!IsPresent)
 			{
 				Destroy(this);
+				return;
+			}
+			
+			if(!CanUpdate())
+			{
+				enabled = false;
 				return;
 			}
 
@@ -77,6 +83,8 @@ namespace fwp.debug
 		{
 			return Keyboard.current.insertKey.wasReleasedThisFrame;
 		}
+
+		virtual protected bool CanUpdate() => IsPresent;
 
 		private void Update()
 		{
