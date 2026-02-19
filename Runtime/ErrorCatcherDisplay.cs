@@ -1,6 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
+
+using UnityEngine.InputSystem;
 
 namespace fwp.debug
 {
@@ -40,6 +41,14 @@ namespace fwp.debug
 		virtual protected bool isReactToLogs() => Debug.isDebugBuild;
 		virtual protected bool isDumpOnDestroy() => Debug.isDebugBuild;
 
+		public bool isKeyFrameReleased(Key k)
+		{
+#if ENABLE_INPUT_SYSTEM
+			if (Keyboard.current != null) return Keyboard.current[k].wasReleasedThisFrame;
+#endif
+			return false;
+		}
+
 		void Start()
 		{
 			if (!isPresent())
@@ -67,11 +76,7 @@ namespace fwp.debug
 		/// </summary>
 		virtual protected bool keySimuReleased()
 		{
-#if ENABLE_INPUT_SYSTEM
-			return UnityEngine.InputSystem.Keyboard.current.homeKey.wasReleasedThisFrame;
-#else
-			return false;
-#endif
+			return isKeyFrameReleased(Key.Home);
 		}
 
 		/// <summary>
@@ -79,16 +84,12 @@ namespace fwp.debug
 		/// </summary>
 		virtual protected bool keyDumpReleased()
 		{
-#if ENABLE_INPUT_SYSTEM
-			return UnityEngine.InputSystem.Keyboard.current.insertKey.wasReleasedThisFrame;
-#else
-			return false;
-#endif
+			return isKeyFrameReleased(Key.Insert);
 		}
 
-		private void Update()
+		virtual protected void Update()
 		{
-			update();
+			updateSimulationKeys();
 		}
 
 		private void OnDestroy()
@@ -103,7 +104,7 @@ namespace fwp.debug
 			}
 		}
 
-		virtual protected void update()
+		void updateSimulationKeys()
 		{
 			if (keyDumpReleased()) // force dump
 			{
@@ -117,6 +118,7 @@ namespace fwp.debug
 				simulateNullRef();
 			}
 		}
+
 
 		virtual public string StringifyHeader()
 		{
