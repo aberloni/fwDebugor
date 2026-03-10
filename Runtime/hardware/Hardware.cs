@@ -31,6 +31,29 @@ namespace fwp.hardware
 		string processorType;
 		int systemMemorySize;
 
+		struct Graphics
+		{
+			public Vector2 screenSize;
+
+			/// <summary>
+			/// vSyncCount = 0 → VSync off (may get tearing but faster FPS).
+			/// vSyncCount = 1 → sync to monitor refresh (e.g., 60Hz → 60 FPS).
+			/// vSyncCount = 2 → sync every second frame (half refresh rate).
+			/// </summary>
+			public int vSyncCount;
+			public int antiAliasing;
+
+			public void read()
+			{
+				screenSize.x = Screen.width;
+				screenSize.y = Screen.height;
+				vSyncCount = QualitySettings.vSyncCount;
+				antiAliasing = QualitySettings.antiAliasing;
+			}
+		}
+
+		Graphics graphics;
+
 		public string GetFilename() => "hardware";
 		public bool IsTimestamped() => false;
 
@@ -57,6 +80,8 @@ namespace fwp.hardware
 			processorType = SystemInfo.processorType;
 
 			systemMemorySize = SystemInfo.systemMemorySize;
+
+			graphics.read();
 		}
 
 		virtual public string StringifyHeader()
@@ -81,6 +106,8 @@ namespace fwp.hardware
 
 			str.AppendLine("Processor count: " + processorCount);
 			str.AppendLine("Processor type: " + processorType);
+			
+			str.AppendLine("Vsync: "+graphics.vSyncCount);
 
 			return str.ToString();
 		}
