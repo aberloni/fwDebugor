@@ -1,5 +1,3 @@
-using System;
-using System.Text;
 using UnityEngine;
 
 using fwp.debug;
@@ -9,15 +7,7 @@ namespace fwp.hardware
 	[System.Serializable]
 	public class Hardware : fwp.debug.iDump
 	{
-		static Hardware instance;
-		static public Hardware Instance
-		{
-			get
-			{
-				if (instance == null) new Hardware();
-				return instance;
-			}
-		}
+		static public Hardware instance;
 
 		string deviceModel;
 		string deviceName;
@@ -64,7 +54,7 @@ namespace fwp.hardware
 			readLocals();
 		}
 
-		static public string DeviceUid => Instance.deviceName;
+		static public string DeviceUid => instance.deviceName;
 
 		public void readLocals()
 		{
@@ -89,9 +79,14 @@ namespace fwp.hardware
 			return "[HARDWARE]";
 		}
 
-		virtual public string StringifyContent()
+		public string StringifyContent()
 		{
-			StringBuilder str = new();
+			return doStringify().ToString();
+		}
+		
+		virtual protected System.Text.StringBuilder doStringify()
+		{
+			System.Text.StringBuilder str = new();
 
 			str.AppendLine("OS: " + operatingSystem);
 			str.AppendLine("Memory size: " + systemMemorySize);
@@ -106,13 +101,13 @@ namespace fwp.hardware
 
 			str.AppendLine("Processor count: " + processorCount);
 			str.AppendLine("Processor type: " + processorType);
-			
-			str.AppendLine("Vsync: "+graphics.vSyncCount);
 
-			return str.ToString();
+			str.AppendLine("Vsync: " + graphics.vSyncCount);
+
+			return str;
 		}
 
-		public void log()
+		virtual public void log()
 		{
 			Debug.Log(StringifyHeader());
 			Debug.Log(StringifyContent());
@@ -122,12 +117,14 @@ namespace fwp.hardware
 		[UnityEditor.MenuItem(DebugorStatics.base_path + "Hardware/log")]
 		static void miLogHardware()
 		{
-			Instance.log();
+			if (instance == null) Debug.LogWarning("can't log hardware, not instance of wrapper");
+			else instance.log();
 		}
 		[UnityEditor.MenuItem(DebugorStatics.base_path + "Hardware/dump")]
 		static void miDumpHardware()
 		{
-			new Dumper(Instance);
+			if (instance == null) Debug.LogWarning("can't dump hardware, not instance of wrapper");
+			else new Dumper(instance);
 		}
 #endif
 
