@@ -7,7 +7,7 @@ namespace fwp.hardware
 	[System.Serializable]
 	public class Hardware : fwp.debug.iDump
 	{
-		static Hardware instance;
+		static protected Hardware instance;
 		static public Hardware Instance
 		{
 			get
@@ -15,7 +15,6 @@ namespace fwp.hardware
 				if (instance == null) instance = new();
 				return instance;
 			}
-
 		}
 
 		public string DeviceUID => deviceName;
