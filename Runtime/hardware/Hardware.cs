@@ -7,19 +7,30 @@ namespace fwp.hardware
 	[System.Serializable]
 	public class Hardware : fwp.debug.iDump
 	{
-		static public Hardware instance;
+		static Hardware instance;
+		static public Hardware Instance
+		{
+			get
+			{
+				if (instance == null) instance = new();
+				return instance;
+			}
 
-		string deviceModel;
-		string deviceName;
-		DeviceType deviceType;
-		string graphicsDeviceName;
-		string graphicsDeviceVendor;
-		string graphicsDeviceVersion;
+		}
 
-		string operatingSystem;
-		int processorCount;
-		string processorType;
-		int systemMemorySize;
+		public string DeviceUID => deviceName;
+
+		public string deviceModel;
+		public string deviceName;
+		public DeviceType deviceType;
+		public string graphicsDeviceName;
+		public string graphicsDeviceVendor;
+		public string graphicsDeviceVersion;
+
+		public string operatingSystem;
+		public int processorCount;
+		public string processorType;
+		public int systemMemorySize;
 
 		struct Graphics
 		{
@@ -50,12 +61,9 @@ namespace fwp.hardware
 		public Hardware()
 		{
 			instance = this;
-
 			readLocals();
 		}
-
-		static public string DeviceUid => instance.deviceName;
-
+		
 		public void readLocals()
 		{
 			deviceModel = SystemInfo.deviceModel;
@@ -83,7 +91,7 @@ namespace fwp.hardware
 		{
 			return doStringify().ToString();
 		}
-		
+
 		virtual protected System.Text.StringBuilder doStringify()
 		{
 			System.Text.StringBuilder str = new();

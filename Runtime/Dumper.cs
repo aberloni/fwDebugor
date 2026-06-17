@@ -3,6 +3,8 @@ using System.IO;
 using System;
 using System.Text;
 
+using fwp.hardware;
+
 namespace fwp.debug
 {
 
@@ -73,7 +75,9 @@ namespace fwp.debug
 		/// </summary>
 		string solveFileName(iDump candidate)
 		{
-			string _file = hardware.Hardware.DeviceUid + "_" + candidate.GetFilename();
+			if (candidate == null) return string.Empty;
+
+			string _file = Hardware.Instance.DeviceUID + "_" + candidate.GetFilename();
 
 			var dt = System.DateTime.Now;
 
@@ -110,10 +114,10 @@ namespace fwp.debug
 
 			// SOLVE CONTENT
 
-			
+
 			StringBuilder dump = new();
 
-			dump.AppendLine("[" + fwp.hardware.Hardware.DeviceUid + "]");
+			dump.AppendLine("[" + Hardware.Instance.DeviceUID + "]");
 
 			var dt = DateTime.Now;
 			dump.AppendLine(dt.ToString("yyyy-MM-dd HH:mm:ss"));
